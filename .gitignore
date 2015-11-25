@@ -1,5 +1,8 @@
 *.caffemodel
 *.pyc
 outputs/*
-test/*
 .DS_Store
+/outputs/
+/.settings/
+/.project
+/.pydevproject
