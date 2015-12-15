@@ -42,8 +42,8 @@ class ProgressPercentage(object):
             sys.stdout.flush()
                              
 class ArtTask(object):
-    def __init__(self,identifier,params):
-        self.identifier = identifier
+    def __init__(self,id,params):
+        self._id = id
         self.params = params
         self.style_image = None
         self.content_image = None
@@ -63,12 +63,14 @@ class TaskFetcher(threading.Thread):
         logging.info('start fetch task')
         while(self._stop_flag != True):
             for message in self._upstream_task_queue.receive_messages():
-                art_task_request = json.loads(message.body)
-                logging.debug('fetched task id: '+art_task_request['identifier'])
-                art_task = self._transform_to_art_task(art_task_request)
-                logging.info('fecthed task: '+art_task.identifier)
-                self._downstream_task_queue.put(art_task)
-                
+                try:
+                    art_task_request = json.loads(message.body)
+                    logging.debug('fetched task id: '+art_task_request['_id'])
+                    art_task = self._transform_to_art_task(art_task_request)
+                    logging.info('fecthed task: '+art_task._id)
+                    self._downstream_task_queue.put(art_task)
+                except Exception,ex:
+                    logging.error(ex)
                 message.delete()
             logging.info('task fetcher sleep 5 seconds')
             time.sleep(5)
@@ -83,15 +85,15 @@ class TaskFetcher(threading.Thread):
                   "length":512,
                   "verbose":False
                   }
-        identifier = art_task_request['identifier']
-        art_task = ArtTask(identifier,params)
+        id = art_task_request['_id']
+        art_task = ArtTask(id,params)
         
         # load style image
         style_image_path = STYLE_IMAGE_ROOT + '/' + STYLE_IMAGE_MAPPING[art_task_request['style']]
         style_image = caffe.io.load_image(style_image_path)
         art_task.style_image = style_image
         # load content image
-        content_image = caffe.io.load_image(art_task_request['content_image_url'])
+        content_image = caffe.io.load_image(art_task_request['contentImageUrl'])
         art_task.content_image = content_image
         
         return art_task
@@ -129,9 +131,9 @@ class OutputPusher(threading.Thread):
         self._stop_flag = True
     def _upload_output_image(self,art_task):
         # save output image to tmp
-        tmp_file_path = '/tmp/'+ art_task.identifier+'-output.tmp.jpg'
+        tmp_file_path = '/tmp/'+ art_task._id+'-output.tmp.jpg'
         imsave(tmp_file_path,art_task.output_image)
-        output_image_key = datetime.date.today().strftime('%Y%m%d') + '/'+art_task.identifier+'/'+art_task.identifier+'-output.jpg'
+        output_image_key = datetime.date.today().strftime('%Y%m%d') + '/'+art_task._id+'/'+art_task._id+'-output.jpg'
         s3_client = boto3.resource('s3')
         s3_client.meta.client.upload_file(tmp_file_path,self._s3_image_bucket_name,output_image_key,ExtraArgs={'ContentType': 'image/jpeg','ACL': 'public-read'},Callback=ProgressPercentage(tmp_file_path))
         output_image_url='http://'+self._s3_image_bucket_name+'.s3.amazonaws.com/' + output_image_key
@@ -139,8 +141,8 @@ class OutputPusher(threading.Thread):
         return output_image_url
     def _notify_completion(self,art_task,output_image_url):
         art_task_completion = {
-                               'identifier':art_task.identifier,
-                               'output_image_url':output_image_url
+                               '_id':art_task._id,
+                               'outputImageUrl':output_image_url
                                }
         self._downstream_task_queue.send_message(MessageBody=json.dumps(art_task_completion))
 

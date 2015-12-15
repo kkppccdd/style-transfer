@@ -64,15 +64,16 @@ A more in-depth set of examples can be found [here](http://frankzliu.com/artisti
 
 # Master
 ## how to run
+
 ```
 export PYTHONPATH=/usr/local/lib/python2.7/site-packages/:~/git/caffe/python/
-
 export AWS_ACCESS_KEY_ID=AKIAJJSPPIELQLNXEXHQ
 export AWS_DEFAULT_REGION=us-east-1
 export AWS_SECRET_ACCESS_KEY=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
 export S3_IMAGE_BUCKET=ideawork-service-dev
 export AWS_TASK_REQUEST_QUEUE_NAME=ideawork-task-request-dev
 export AWS_TASK_COMPLETION_QUEUE_NAME=ideawork-task-completion-dev
-
 python2.7 master.py
 ```
+
+

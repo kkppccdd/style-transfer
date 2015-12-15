@@ -66,8 +66,8 @@ class OutputPusherTest(unittest.TestCase):
         self.assertEqual(1, len(messages))
         completion_message = messages[0]
         completion = json.loads(completion_message.body)
-        self.assertEquals('id12345',completion['identifier'])
-        self.assertIsNotNone(completion['output_image_url'])
+        self.assertEquals('id12345',completion['_id'])
+        self.assertIsNotNone(completion['outputImageUrl'])
         
     def test_should_upload_output_image_given_aws_queue_when_completed(self):
         #construct
@@ -87,7 +87,7 @@ class OutputPusherTest(unittest.TestCase):
         
         # verify
         s3_bucket = os.environ['S3_IMAGE_BUCKET']
-        output_image_url = 'http://'+s3_bucket+'.s3.amazonaws.com/' + datetime.date.today().strftime('%Y%m%d') + '/'+art_task.identifier+'/'+art_task.identifier+'-output.jpg'
+        output_image_url = 'http://'+s3_bucket+'.s3.amazonaws.com/' + datetime.date.today().strftime('%Y%m%d') + '/'+art_task._id+'/'+art_task._id+'-output.jpg'
         output_image = caffe.io.load_image(output_image_url)
         self.assertIsNotNone(output_image)
         logging.info('verify uploaded image pass')

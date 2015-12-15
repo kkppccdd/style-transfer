@@ -46,8 +46,8 @@ class TaskFetcherTest(unittest.TestCase):
         # aws queue is created
 
         # given task request to aws task request queue
-        art_task_request = {'identifier':'id12345',
-                            'content_image_url':'https://www.baidu.com/img/bd_logo1.png',
+        art_task_request = {'_id':'id12345',
+                            'contentImageUrl':'https://www.baidu.com/img/bd_logo1.png',
                             'style':'starry_night',
                             'params':{
                   "ratio":1e5,
@@ -64,14 +64,14 @@ class TaskFetcherTest(unittest.TestCase):
         art_task = self._local_task_request_queue.get(True, 30)
         
         self.assertIsNotNone(art_task)
-        self.assertEquals('id12345',art_task.identifier)
+        self.assertEquals('id12345',art_task._id)
         
        
     def test_should_get_task_with_style_image_given_task_request_queue_when_send_task_request(self):
         
         # given task request to aws task request queue
-        art_task_request = {'identifier':'id12345',
-                            'content_image_url':'https://www.baidu.com/img/bd_logo1.png',
+        art_task_request = {'_id':'id12345',
+                            'contentImageUrl':'https://www.baidu.com/img/bd_logo1.png',
                             'style':'starry_night',
                             'params':{
                   "ratio":1e5,
@@ -90,8 +90,8 @@ class TaskFetcherTest(unittest.TestCase):
     
     def test_should_get_task_with_content_image_given_task_request_queue_when_send_task_request(self):
         # given task request to aws task request queue
-        art_task_request = {'identifier':'id12345',
-                            'content_image_url':'https://www.baidu.com/img/bd_logo1.png',
+        art_task_request = {'_id':'id12345',
+                            'contentImageUrl':'https://www.baidu.com/img/bd_logo1.png',
                             'style':'starry_night',
                             'params':{
                   "ratio":1e5,
